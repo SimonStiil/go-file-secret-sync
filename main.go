@@ -19,23 +19,23 @@ import (
 )
 
 type FileSecretSync struct {
-	client       kubernetes.Interface
-	namespace    string
-	folderPath   string
-	secretName   string
-	watcher      *fsnotify.Watcher
+	client     kubernetes.Interface
+	namespace  string
+	folderPath string
+	secretName string
+	watcher    *fsnotify.Watcher
 }
 
 func main() {
 	// Read environment variables
-	folderToRead := os.Getenv("folder_to_read")
+	folderToRead := os.Getenv("FOLDER_TO_READ")
 	if folderToRead == "" {
-		log.Fatal("folder_to_read environment variable is required")
+		log.Fatal("FOLDER_TO_READ environment variable is required")
 	}
 
-	secretToWrite := os.Getenv("secret_to_write")
+	secretToWrite := os.Getenv("SECRET_TO_WRITE")
 	if secretToWrite == "" {
-		log.Fatal("secret_to_write environment variable is required")
+		log.Fatal("SECRET_TO_WRITE environment variable is required")
 	}
 
 	// Get current namespace from service account
@@ -95,7 +95,7 @@ func getCurrentNamespace() (string, error) {
 
 func (fss *FileSecretSync) syncFiles() error {
 	log.Printf("Reading files from folder: %s", fss.folderPath)
-	
+
 	// Read all files from the folder
 	data, err := fss.readFolderContents()
 	if err != nil {
@@ -110,7 +110,7 @@ func (fss *FileSecretSync) syncFiles() error {
 	// Get existing secret
 	ctx := context.Background()
 	secret, err := fss.client.CoreV1().Secrets(fss.namespace).Get(ctx, fss.secretName, metav1.GetOptions{})
-	
+
 	if errors.IsNotFound(err) {
 		// Create new secret
 		return fss.createSecret(ctx, data)
@@ -155,7 +155,7 @@ func (fss *FileSecretSync) readFolderContents() (map[string][]byte, error) {
 		// Replace path separators with dots for secret key naming
 		key := strings.ReplaceAll(relPath, string(filepath.Separator), ".")
 		data[key] = content
-		
+
 		log.Printf("Read file: %s -> %s (%d bytes)", path, key, len(content))
 		return nil
 	})
@@ -187,7 +187,7 @@ func (fss *FileSecretSync) createSecret(ctx context.Context, data map[string][]b
 
 func (fss *FileSecretSync) updateSecret(ctx context.Context, secret *corev1.Secret, data map[string][]byte) error {
 	secret.Data = data
-	
+
 	_, err := fss.client.CoreV1().Secrets(fss.namespace).Update(ctx, secret, metav1.UpdateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to update secret: %w", err)

@@ -398,34 +398,34 @@ func TestSyncFilesWithAPIError(t *testing.T) {
 
 func TestMainEnvironmentVariables(t *testing.T) {
 	// Test missing folder_to_read
-	os.Unsetenv("folder_to_read")
-	os.Setenv("secret_to_write", "test-secret")
+	os.Unsetenv("FOLDER_TO_READ")
+	os.Setenv("SECRET_TO_WRITE", "test-secret")
 
 	// We can't easily test main() directly, but we can test the environment variable checking logic
-	folderToRead := os.Getenv("folder_to_read")
-	secretToWrite := os.Getenv("secret_to_write")
+	folderToRead := os.Getenv("FOLDER_TO_READ")
+	secretToWrite := os.Getenv("SECRET_TO_WRITE")
 
 	if folderToRead != "" {
-		t.Error("Expected folder_to_read to be empty")
+		t.Error("Expected FOLDER_TO_READ to be empty")
 	}
 
 	if secretToWrite != "test-secret" {
-		t.Errorf("Expected secret_to_write to be 'test-secret', got %s", secretToWrite)
+		t.Errorf("Expected SECRET_TO_WRITE to be 'test-secret', got %s", secretToWrite)
 	}
 
 	// Test missing secret_to_write
-	os.Setenv("folder_to_read", "/tmp")
-	os.Unsetenv("secret_to_write")
+	os.Setenv("FOLDER_TO_READ", "/tmp")
+	os.Unsetenv("SECRET_TO_WRITE")
 
-	folderToRead = os.Getenv("folder_to_read")
-	secretToWrite = os.Getenv("secret_to_write")
+	folderToRead = os.Getenv("FOLDER_TO_READ")
+	secretToWrite = os.Getenv("secretSECRET_TO_WRITE_to_write")
 
 	if folderToRead != "/tmp" {
-		t.Errorf("Expected folder_to_read to be '/tmp', got %s", folderToRead)
+		t.Errorf("Expected FOLDER_TO_READ to be '/tmp', got %s", folderToRead)
 	}
 
 	if secretToWrite != "" {
-		t.Error("Expected secret_to_write to be empty")
+		t.Error("Expected SECRET_TO_WRITE to be empty")
 	}
 }
 
