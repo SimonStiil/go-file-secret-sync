@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-file-secret-sync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-file-secret-sync
+  template:
+    metadata:
+      labels:
+        app: go-file-secret-sync
+    spec:
+      containers:
+        - name: go-file-secret-sync
+          image: ghcr.io/simonstiil/go-file-secret-sync:latest
+          env:
+            - name: FOLDER_TO_READ
+              value: /home/user/.aws
+            - name: SECRET_TO_WRITE
+              value: go-file-secret-sync
+          volumeMounts:
+            - name: credentials
+              mountPath: /home/user/my-credentials
+        - name: your-sidecar-container
+          image: your-sidecar-image:latest
+          env:
+            - name: SIDE_CAR_ENV_VAR
+              value: "value"
+          volumeMounts:
+            - name: credentials
+              mountPath: /home/user/my-credentials
+      volumes:
+        - name: credentials
+          emptyDir:
+            sizeLimit: 10Mi
+      serviceAccountName: go-file-secret-sync
