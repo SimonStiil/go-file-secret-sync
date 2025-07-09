@@ -18,7 +18,7 @@ spec:
           image: ghcr.io/simonstiil/go-file-secret-sync:latest
           env:
             - name: FOLDER_TO_READ
-              value: /home/user/.aws
+              value: /home/user/my-credentials
             - name: SECRET_TO_WRITE
               value: go-file-secret-sync
           volumeMounts:
